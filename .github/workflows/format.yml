@@ -1,0 +1,30 @@
+name: format
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  gofmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: gofmt -s check
+        run: |
+          set -euo pipefail
+          files="$(gofmt -l -s .)"
+          if [ -n "$files" ]; then
+            echo "These files are not gofmt -s formatted:"
+            echo "$files"
+            echo
+            echo "Run: gofmt -w -s ."
+            exit 1
+          fi
